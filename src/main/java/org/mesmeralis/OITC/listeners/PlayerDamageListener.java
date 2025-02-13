@@ -1,7 +1,6 @@
 package org.mesmeralis.OITC.listeners;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
