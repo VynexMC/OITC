@@ -1,0 +1,9 @@
+name: OITC
+version: '1.0-SNAPSHOT'
+main: org.mesmeralis.OITC.Main
+api-version: '1.21'
+commands:
+  admin:
+    usage: /admin <args> [args]
+    description: OITC administrator command.
+    permission: oitc.admin
