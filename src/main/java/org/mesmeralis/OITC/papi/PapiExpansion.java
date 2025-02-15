@@ -8,6 +8,8 @@ import org.jetbrains.annotations.Nullable;
 import org.mesmeralis.OITC.Main;
 import org.mesmeralis.OITC.utils.ColourUtils;
 
+import java.util.concurrent.CompletableFuture;
+
 public class PapiExpansion extends PlaceholderExpansion {
     private final Main main;
     public PapiExpansion (Main main) {
