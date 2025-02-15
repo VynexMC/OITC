@@ -9,9 +9,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.mesmeralis.OITC.Main;
-import org.mesmeralis.OITC.storage.SQLGetter;
 import org.mesmeralis.OITC.utils.ColourUtils;
 
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,17 +21,20 @@ public class GameManager {
     public String prefix = "&c&lOITC &8\u00BB ";
     public Main main;
     public boolean isGameRunning = false;
-    public SQLGetter data;
+    public HashMap<Player, Integer> gameKills = new HashMap<>();
 
-    public GameManager(Main main, SQLGetter data) {
+    public GameManager(Main main) {
         this.main = main;
-        this.data = data;
     }
 
     public void startGame() {
         AtomicInteger counter = new AtomicInteger(6);
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         int starting;
+        for(Player online : Bukkit.getOnlinePlayers()) {
+            gameKills.put(online.getPlayer(), 0);
+        }
+
         starting = scheduler.scheduleSyncRepeatingTask(main, () -> {
             counter.getAndDecrement();
             Bukkit.getServer().broadcastMessage(ColourUtils.colour(prefix + "&eStarting in " + counter));
@@ -45,7 +48,7 @@ public class GameManager {
             for(Player online : Bukkit.getOnlinePlayers()) {
                 online.sendTitle(ColourUtils.colour("&c&lOne in the Chamber"), "Developed by Mesmeralis", 20, 60, 20);
                 online.playSound(online, Sound.ENTITY_ENDER_DRAGON_GROWL, 10, 1);
-                data.createPlayer(online.getPlayer());
+                main.data.createPlayer(online.getPlayer());
             }
             giveItems();
             isGameRunning = true;
@@ -54,12 +57,16 @@ public class GameManager {
 
         scheduler.scheduleSyncDelayedTask(main, () -> {
             for(Player online : Bukkit.getOnlinePlayers()) {
-                online.sendTitle(ColourUtils.colour("&4&lGAME OVER"), "Thanks for playing!", 20, 60, 20);
+                online.sendTitle(ColourUtils.colour("&4&lGAME OVER"), ColourUtils.colour("&e" + getWinner().getName() + "&a won the game!"), 20, 60, 20);
                 online.playSound(online, Sound.ENTITY_PLAYER_LEVELUP, 10, 1);
                 online.getInventory().clear();
                 online.teleport(Bukkit.getServer().getWorld("spawn").getSpawnLocation());
             }
+            this.getWinner().playSound(getWinner().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 10, 5);
+            main.data.addPoints(this.getWinner().getUniqueId(), 15);
+            gameKills.clear();
             isGameRunning = false;
+            main.data.addWins(this.getWinner().getUniqueId(), 1);
         }, 2400L);
     }
 
@@ -82,6 +89,19 @@ public class GameManager {
             int locNumber = randomLoc.nextInt(10) + 1;
             online.teleport(Objects.requireNonNull(main.getConfig().getLocation("gamespawn." + locNumber)));
         }
+    }
+
+    public Player getWinner() {
+        int highest = 0;
+        Player winner = null;
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            int amount = this.gameKills.get(online.getPlayer());
+            if (highest < amount) {
+                highest = amount;
+                winner = online;
+            }
+        }
+        return winner;
     }
 
 }

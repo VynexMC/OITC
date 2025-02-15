@@ -39,15 +39,24 @@ public class PlayerDamageListener implements Listener {
         if (event.getDamager() instanceof Arrow) {
                 if (event.getEntity() instanceof Player) {
                     Player damaged = (Player) event.getEntity();
-                    Player shooter = (Player) ((Arrow) event.getDamager()).getShooter();
+                    Arrow arrow = (Arrow) event.getDamager();
+                    Player shooter = (Player) arrow.getShooter();
                     Bukkit.getServer().broadcastMessage(ColourUtils.colour(manager.prefix + "&c" + damaged.getName() + "&e was shot by &a" + shooter.getName() + "&e."));
                     data.addKills(shooter.getUniqueId(), 1);
+                    this.manager.gameKills.put(shooter.getPlayer(), this.manager.gameKills.get(shooter) + 1);
                     data.addDeaths(damaged.getUniqueId(), 1);
+                    data.addPoints(shooter.getUniqueId(), 5);
+                    if(data.getPoints(damaged.getUniqueId()) > 2) {
+                        data.addPoints(damaged.getUniqueId(), -2);
+                    }
                     int locNumber = randomLoc.nextInt(10) + 1;
                     damaged.teleport(Objects.requireNonNull(main.getConfig().getLocation("gamespawn." + locNumber)));
                     damaged.setHealth(20);
+                    shooter.setHealth(20);
+                    arrow.remove();
                     damaged.playSound(Objects.requireNonNull(damaged.getPlayer()).getLocation(), Sound.ENTITY_PLAYER_DEATH, 10, 1);
                     damaged.sendTitle(ColourUtils.colour("&c&lYOU DIED!"), "", 0, 20, 10);
+                    damaged.setArrowsInBody(0);
                 }
         }
 

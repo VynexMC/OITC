@@ -6,7 +6,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.mesmeralis.OITC.commands.AdminCommand;
 import org.mesmeralis.OITC.listeners.PlayerDamageListener;
 import org.mesmeralis.OITC.listeners.PlayerListener;
+import org.mesmeralis.OITC.listeners.ProjectileHitListener;
 import org.mesmeralis.OITC.managers.GameManager;
+import org.mesmeralis.OITC.papi.PapiExpansion;
 import org.mesmeralis.OITC.storage.SQLGetter;
 import org.mesmeralis.OITC.storage.Storage;
 
@@ -23,16 +25,17 @@ public final class Main extends JavaPlugin {
     public void onEnable() {
         this.saveDefaultConfig();
         this.storage = new Storage(this);
-        this.data = new SQLGetter(this);
-        this.gameManager = new GameManager(this, data);
         try {
             storage.connectSQL();
             Bukkit.getLogger().info("Database connected successfully.");
         } catch (ClassNotFoundException | SQLException e) {
             Bukkit.getLogger().info("Database was unable to connect.");
         }
+        this.data = new SQLGetter(this);
+        this.gameManager = new GameManager(this);
         this.initListeners();
         this.getCommand("admin").setExecutor(new AdminCommand(gameManager, this));
+        new PapiExpansion(this).register();
     }
 
     @Override
@@ -46,6 +49,7 @@ public final class Main extends JavaPlugin {
         final PluginManager pluginManager = this.getServer().getPluginManager();
         pluginManager.registerEvents(new PlayerListener(gameManager), this);
         pluginManager.registerEvents(new PlayerDamageListener(this, gameManager, data), this);
+        pluginManager.registerEvents(new ProjectileHitListener(this, gameManager), this);
     }
 
 
