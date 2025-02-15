@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.mesmeralis.OITC.Main;
+import org.mesmeralis.OITC.storage.SQLGetter;
 import org.mesmeralis.OITC.utils.ColourUtils;
 
 import java.util.Objects;
@@ -20,9 +21,11 @@ public class GameManager {
     public String prefix = "&c&lOITC &8\u00BB ";
     public Main main;
     public boolean isGameRunning = false;
+    public SQLGetter data;
 
-    public GameManager(Main main) {
+    public GameManager(Main main, SQLGetter data) {
         this.main = main;
+        this.data = data;
     }
 
     public void startGame() {
@@ -35,7 +38,6 @@ public class GameManager {
             for(Player online : Bukkit.getOnlinePlayers()) {
                 online.playSound(online, Sound.UI_BUTTON_CLICK, 10, 1);
             }
-
         },0L, 20L);
 
         scheduler.scheduleSyncDelayedTask(main, () ->{
@@ -43,6 +45,7 @@ public class GameManager {
             for(Player online : Bukkit.getOnlinePlayers()) {
                 online.sendTitle(ColourUtils.colour("&c&lOne in the Chamber"), "Developed by Mesmeralis", 20, 60, 20);
                 online.playSound(online, Sound.ENTITY_ENDER_DRAGON_GROWL, 10, 1);
+                data.createPlayer(online.getPlayer());
             }
             giveItems();
             isGameRunning = true;

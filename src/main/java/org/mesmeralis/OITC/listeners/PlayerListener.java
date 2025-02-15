@@ -20,7 +20,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        event.setJoinMessage(ColourUtils.colour(gameManager.prefix + event.getPlayer().getName() + " joined. &eThere are now &a" + onlinePlayers + "&8/&a" + maxPlayers + "&e players online." ));
+        event.setJoinMessage(ColourUtils.colour(gameManager.prefix + "&a" + event.getPlayer().getName() + " joined. &eThere are now &a" + onlinePlayers + "&8/&a" + maxPlayers + "&e players online." ));
         if(onlinePlayers == maxPlayers) {
             gameManager.startGame();
         }
@@ -28,7 +28,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        event.setQuitMessage(ColourUtils.colour(gameManager.prefix + event.getPlayer().getName() + " left. &eThere are now &a" + onlinePlayers + "&8/&a" + maxPlayers + "&e players online." ));
+        event.setQuitMessage(ColourUtils.colour(gameManager.prefix + "&c" + event.getPlayer().getName() + " left. &eThere are now &a" + onlinePlayers + "&8/&a" + maxPlayers + "&e players online." ));
     }
 
 }
