@@ -62,11 +62,12 @@ public class GameManager {
                 online.getInventory().clear();
                 online.teleport(Bukkit.getServer().getWorld("spawn").getSpawnLocation());
             }
-            this.getWinner().playSound(getWinner().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 10, 5);
-            main.data.addPoints(this.getWinner().getUniqueId(), 15);
+            Player winner = this.getWinner();
+            winner.playSound(winner.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 10, 5);
+            main.data.addPoints(winner.getUniqueId(), 15);
+            main.data.addWins(winner.getUniqueId(), 1);
             gameKills.clear();
             isGameRunning = false;
-            main.data.addWins(this.getWinner().getUniqueId(), 1);
         }, 2400L);
     }
 
