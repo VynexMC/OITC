@@ -1,5 +1,7 @@
 package org.mesmeralis.OITC.papi;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,6 +52,27 @@ public class PapiExpansion extends PlaceholderExpansion {
             String wins = String.valueOf(this.main.data.getWins(player.getUniqueId()));
             return ColourUtils.colour(wins);
         }
+        if (params.equalsIgnoreCase("rank")) {
+            int points = this.main.data.getPoints(player.getUniqueId());
+            String rank = this.main.rankManager.getRankFromPoints(points);
+            String prefix = this.main.rankManager.getRankPrefix(rank);
+            return ColourUtils.colour(prefix);
+        }
+        if (params.equalsIgnoreCase("toppoints")) {
+            for (OfflinePlayer top : Bukkit.getOfflinePlayers()) {
+                if(main.data.getPoints(player.getUniqueId()) >= main.data.getPoints(top.getUniqueId())) {
+                    return ColourUtils.colour(player.getName());
+                }
+            }
+        }
+        if (params.equalsIgnoreCase("topwins")) {
+            for (OfflinePlayer top : Bukkit.getOfflinePlayers()) {
+                if(main.data.getWins(player.getUniqueId()) >= main.data.getWins(top.getUniqueId())) {
+                    return ColourUtils.colour(player.getName());
+                }
+            }
+        }
+
         return null;
     }
 }

@@ -8,6 +8,7 @@ import org.mesmeralis.OITC.listeners.PlayerDamageListener;
 import org.mesmeralis.OITC.listeners.PlayerListener;
 import org.mesmeralis.OITC.listeners.ProjectileHitListener;
 import org.mesmeralis.OITC.managers.GameManager;
+import org.mesmeralis.OITC.managers.RankManager;
 import org.mesmeralis.OITC.papi.PapiExpansion;
 import org.mesmeralis.OITC.storage.SQLGetter;
 import org.mesmeralis.OITC.storage.Storage;
@@ -20,6 +21,7 @@ public final class Main extends JavaPlugin {
     public Storage storage;
     public SQLGetter data;
     private GameManager gameManager;
+    public RankManager rankManager;
 
     @Override
     public void onEnable() {
@@ -35,6 +37,8 @@ public final class Main extends JavaPlugin {
         this.gameManager = new GameManager(this);
         this.initListeners();
         this.getCommand("admin").setExecutor(new AdminCommand(gameManager, this));
+        this.rankManager = new RankManager(this);
+        rankManager.loadRanks();
         new PapiExpansion(this).register();
     }
 

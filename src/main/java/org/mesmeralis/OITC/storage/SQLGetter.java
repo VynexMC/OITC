@@ -98,17 +98,17 @@ public class SQLGetter {
     }
 
     public int getPoints(UUID uuid) {
-        try {
-            PreparedStatement ps = main.storage.getConnection().prepareStatement("SELECT POINTS FROM oitc WHERE UUID=?");
-            ps.setString(1, uuid.toString());
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("POINTS");
+            try {
+                PreparedStatement ps = main.storage.getConnection().prepareStatement("SELECT POINTS FROM oitc WHERE UUID=?");
+                ps.setString(1, uuid.toString());
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt("POINTS");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
+            return 0;
     }
 
     public int getKills(UUID uuid) {
@@ -122,7 +122,7 @@ public class SQLGetter {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return 0;
+            return 0;
     }
 
     public int getDeaths(UUID uuid) {
@@ -151,6 +151,7 @@ public class SQLGetter {
             e.printStackTrace();
         }
         return 0;
+
     }
 
 }

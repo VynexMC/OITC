@@ -3,3 +3,19 @@ port: 3306
 database: ''
 username: ''
 password: ''
+ranks:
+  Rookie:
+    prefix: ""
+    points: 0
+  Cadet:
+    prefix: ""
+    points: 100
+  Sharpshooter:
+    prefix: ""
+    points: 500
+  Hawkeye:
+    prefix: ""
+    points: 1000
+  Skeletal:
+    prefix: ""
+    points: 2500

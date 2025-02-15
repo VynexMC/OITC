@@ -33,7 +33,11 @@ public class AdminCommand implements CommandExecutor {
                 if(args[0].equalsIgnoreCase("setgamespawn")) {
                     sender.sendMessage(ColourUtils.colour(manager.prefix + "&c/admin setgamespawn [1-10]"));
                 }
+                if(args[0].equalsIgnoreCase("setpoints")) {
+                    sender.sendMessage(ColourUtils.colour(manager.prefix + "/admin setpoints [user] [points]"));
+                }
             }
+
             if(args.length == 2) {
                 if(args[0].equalsIgnoreCase("setgamespawn")) {
                     switch(args[1]) {
