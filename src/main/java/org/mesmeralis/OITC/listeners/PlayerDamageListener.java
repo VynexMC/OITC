@@ -46,8 +46,8 @@ public class PlayerDamageListener implements Listener {
                     this.manager.gameKills.put(shooter.getPlayer(), this.manager.gameKills.get(shooter) + 1);
                     data.addDeaths(damaged.getUniqueId(), 1);
                     data.addPoints(shooter.getUniqueId(), 5);
-                    if(data.getPoints(damaged.getUniqueId()) > 2) {
-                        data.addPoints(damaged.getUniqueId(), -2);
+                    if(this.main.map.get(damaged.getUniqueId()).points > 3) {
+                        data.addPoints(damaged.getUniqueId(), -3);
                     }
                     int locNumber = randomLoc.nextInt(10) + 1;
                     damaged.teleport(Objects.requireNonNull(main.getConfig().getLocation("gamespawn." + locNumber)));

@@ -96,7 +96,7 @@ public class GameManager {
         int highest = 0;
         Player winner = null;
         for (Player online : Bukkit.getOnlinePlayers()) {
-            int amount = this.gameKills.get(online.getPlayer());
+            int amount = this.gameKills.getOrDefault(online.getPlayer(), 0);
             if (highest < amount) {
                 highest = amount;
                 winner = online;
