@@ -36,8 +36,12 @@ public class AdminCommand implements CommandExecutor {
                 if(args[0].equalsIgnoreCase("setpoints")) {
                     sender.sendMessage(ColourUtils.colour(manager.prefix + "/admin setpoints [user] [points]"));
                 }
+                if(args[0].equalsIgnoreCase("setlobby")) {
+                    player.sendMessage(ColourUtils.colour(manager.prefix + "&aSet the waiting lobby spawn to your location."));
+                    main.getConfig().set("lobby", player.getLocation());
+                    main.saveConfig();
+                }
             }
-
             if(args.length == 2) {
                 if(args[0].equalsIgnoreCase("setgamespawn")) {
                     switch(args[1]) {

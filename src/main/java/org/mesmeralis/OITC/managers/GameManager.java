@@ -1,6 +1,7 @@
 package org.mesmeralis.OITC.managers;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
@@ -46,9 +47,10 @@ public class GameManager {
         scheduler.scheduleSyncDelayedTask(main, () ->{
             scheduler.cancelTask(starting);
             for(Player online : Bukkit.getOnlinePlayers()) {
-                online.sendTitle(ColourUtils.colour("&c&lOne in the Chamber"), "Developed by Mesmeralis", 20, 60, 20);
+                online.sendTitle(ColourUtils.colour("&c&lOne in the Chamber"), "Developed by SecMind", 20, 60, 20);
                 online.playSound(online, Sound.ENTITY_ENDER_DRAGON_GROWL, 10, 1);
                 main.data.createPlayer(online.getPlayer());
+                online.setGameMode(GameMode.ADVENTURE);
             }
             giveItems();
             isGameRunning = true;
@@ -60,7 +62,8 @@ public class GameManager {
                 online.sendTitle(ColourUtils.colour("&4&lGAME OVER"), ColourUtils.colour("&e" + getWinner().getName() + "&a won the game!"), 20, 60, 20);
                 online.playSound(online, Sound.ENTITY_PLAYER_LEVELUP, 10, 1);
                 online.getInventory().clear();
-                online.teleport(Bukkit.getServer().getWorld("spawn").getSpawnLocation());
+                online.teleport(Objects.requireNonNull(main.getConfig().getLocation("lobby")));
+                online.setGameMode(GameMode.ADVENTURE);
             }
             Player winner = this.getWinner();
             winner.playSound(winner.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 10, 5);
