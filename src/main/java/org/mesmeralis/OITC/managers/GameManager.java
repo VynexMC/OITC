@@ -58,19 +58,33 @@ public class GameManager {
         }, 100L);
 
         scheduler.scheduleSyncDelayedTask(main, () -> {
-            for(Player online : Bukkit.getOnlinePlayers()) {
-                online.sendTitle(ColourUtils.colour("&4&lGAME OVER"), ColourUtils.colour("&e" + getWinner().getName() + "&a won the game!"), 20, 60, 20);
-                online.playSound(online, Sound.ENTITY_PLAYER_LEVELUP, 10, 1);
-                online.getInventory().clear();
-                online.teleport(Objects.requireNonNull(main.getConfig().getLocation("lobby")));
-                online.setGameMode(GameMode.ADVENTURE);
-            }
             Player winner = this.getWinner();
-            winner.playSound(winner.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 10, 5);
-            main.data.addPoints(winner.getUniqueId(), 15);
-            main.data.addWins(winner.getUniqueId(), 1);
-            gameKills.clear();
-            isGameRunning = false;
+            if(winner != null) {
+                for(Player online : Bukkit.getOnlinePlayers()) {
+                    online.sendTitle(ColourUtils.colour("&4&lGAME OVER"), ColourUtils.colour("&e" + getWinner().getName() + "&a won the game!"), 20, 60, 20);
+                    online.playSound(online, Sound.ENTITY_PLAYER_LEVELUP, 10, 1);
+                    online.getInventory().clear();
+                    online.teleport(Objects.requireNonNull(main.getConfig().getLocation("lobby")));
+                    online.setGameMode(GameMode.ADVENTURE);
+                }
+                winner.playSound(winner.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 10, 5);
+                main.data.addPoints(winner.getUniqueId(), 15);
+                main.data.addWins(winner.getUniqueId(), 1);
+                gameKills.clear();
+                isGameRunning = false;
+                Bukkit.getServer().broadcastMessage(ColourUtils.colour(prefix + "&eCongratulations to &a" + winner.getName() + "&e for winning. They have been given &a15 &epoints."));
+            } else {
+                for(Player online : Bukkit.getOnlinePlayers()) {
+                    online.sendTitle(ColourUtils.colour("&4&lGAME OVER"), ColourUtils.colour("&cThere was no winner."), 20, 60, 20);
+                    online.playSound(online, Sound.ENTITY_PLAYER_LEVELUP, 10, 1);
+                    online.getInventory().clear();
+                    online.teleport(Objects.requireNonNull(main.getConfig().getLocation("lobby")));
+                    online.setGameMode(GameMode.ADVENTURE);
+                }
+                gameKills.clear();
+                isGameRunning = false;
+                Bukkit.getServer().broadcastMessage(ColourUtils.colour(prefix + "&cThere was no winner for this game."));
+            }
         }, 2400L);
     }
 
