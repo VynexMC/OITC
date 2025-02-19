@@ -54,9 +54,7 @@ public class PlayerJoinQuitListener implements Listener {
             }
         } else {
             event.setJoinMessage(ColourUtils.colour(this.main.gameManager.prefix + "&a" + event.getPlayer().getName() + " joined as a spectator."));
-            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(main, () -> {
-                setPlayerAsSpectator(event.getPlayer());
-            }, 5L);
+            setPlayerAsSpectator(event.getPlayer());
         }
 
     }
@@ -93,13 +91,15 @@ public void onAsyncPlayerJoin(AsyncPlayerPreLoginEvent event) {
 }
 
 private void setPlayerAsSpectator(Player player) {
-    player.setGameMode(GameMode.SPECTATOR);
     Location location = new Location(Bukkit.getWorld(Objects.requireNonNull(main.getConfig().getString("gamespawn.1.world"))),
             main.getConfig().getInt("gamespawn.1.x"), main.getConfig().getInt("gamespawn.1.y"),
             main.getConfig().getInt("gamespawn.1.z"),
             main.getConfig().getInt("gamespawn.1.yaw"), main.getConfig().getInt("gamespawn.1.pitch"));
     player.sendMessage(ColourUtils.colour(this.main.gameManager.prefix + "&eYou joined while the game was running, you are now a spectator."));
-    player.teleport(location);
+    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(main, () -> {
+        player.setGameMode(GameMode.SPECTATOR);
+        player.teleport(location);
+    }, 10L);
 }
 
 
