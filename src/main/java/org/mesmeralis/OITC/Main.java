@@ -53,7 +53,7 @@ public final class Main extends JavaPlugin {
         Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, () -> {
             topWins = data.getTopWins().join();
             topPoints = data.getTopPoints().join();
-        }, 0L,2400L);
+        }, 0L,600L);
         for (Player player : Bukkit.getOnlinePlayers()) {
             final int points = this.data.getPoints(player.getUniqueId()).join();
             final int kills = this.data.getKills(player.getUniqueId()).join();
