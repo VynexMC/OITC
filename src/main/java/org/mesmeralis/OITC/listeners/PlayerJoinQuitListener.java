@@ -26,7 +26,7 @@ public class PlayerJoinQuitListener implements Listener {
         this.main = main;
     }
 
-    int playersNeeded = 2;
+    public static int playersNeeded = 2;
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {

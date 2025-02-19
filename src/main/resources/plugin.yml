@@ -7,3 +7,6 @@ commands:
     usage: /admin <args> [args]
     description: OITC administrator command.
     permission: oitc.admin
+  stats:
+    usage: /stats [args]
+    description: Get your stats, or another player's stats.

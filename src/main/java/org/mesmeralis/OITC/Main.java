@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mesmeralis.OITC.commands.AdminCommand;
+import org.mesmeralis.OITC.commands.StatsCommand;
 import org.mesmeralis.OITC.listeners.PlayerDamageListener;
 import org.mesmeralis.OITC.listeners.PlayerJoinQuitListener;
 import org.mesmeralis.OITC.listeners.ProjectileHitListener;
@@ -43,6 +44,7 @@ public final class Main extends JavaPlugin {
         this.gameManager = new GameManager(this);
         this.initListeners();
         this.getCommand("admin").setExecutor(new AdminCommand(gameManager, this));
+        this.getCommand("stats").setExecutor(new StatsCommand(this));
         this.rankManager = new RankManager(this);
         rankManager.loadRanks();
         new PapiExpansion(this).register();

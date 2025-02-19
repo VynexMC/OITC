@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.mesmeralis.OITC.Main;
+import org.mesmeralis.OITC.listeners.PlayerJoinQuitListener;
 import org.mesmeralis.OITC.utils.ColourUtils;
 
 import java.util.HashMap;
@@ -139,6 +140,16 @@ public class GameManager {
             isGameRunning = false;
             Bukkit.getServer().broadcastMessage(ColourUtils.colour(prefix + "&cThere was no winner for this game."));
         }
+        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(main, () -> {
+            Bukkit.getServer().broadcastMessage(ColourUtils.colour(main.gameManager.prefix + "&aThe next game will begin in 2 minutes."));
+        }, 200L);
+        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(main, () -> {
+            if(Bukkit.getOnlinePlayers().size() >= PlayerJoinQuitListener.playersNeeded) {
+                startGame();
+            }
+        }, 2400L);
+
     }
+
 
 }
