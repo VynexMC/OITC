@@ -1,6 +1,7 @@
 package org.mesmeralis.OITC.listeners;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -50,7 +51,11 @@ public class PlayerDamageListener implements Listener {
                         data.addPoints(damaged.getUniqueId(), -3);
                     }
                     int locNumber = randomLoc.nextInt(10) + 1;
-                    damaged.teleport(Objects.requireNonNull(main.getConfig().getLocation("gamespawn." + locNumber)));
+                    Location location = new Location(Bukkit.getWorld(Objects.requireNonNull(main.getConfig().getString("gamespawn." +locNumber + ".world"))),
+                            main.getConfig().getInt("gamespawn." + locNumber + ".x"), main.getConfig().getInt("gamespawn." + locNumber + ".y"),
+                            main.getConfig().getInt("gamespawn." + locNumber + ".z"),
+                            main.getConfig().getInt("gamespawn." + locNumber + ".yaw"), main.getConfig().getInt("gamespawn." + locNumber + ".pitch"));
+                    damaged.teleport(location);
                     damaged.setHealth(20);
                     shooter.setHealth(20);
                     arrow.remove();

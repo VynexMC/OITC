@@ -25,72 +25,24 @@ public class GameManager {
         this.main = main;
     }
 
+    public int starting;
+
     public void startGame() {
         AtomicInteger counter = new AtomicInteger(6);
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-        int starting;
         for (Player online : Bukkit.getOnlinePlayers()) {
             gameKills.put(online.getPlayer(), 0);
         }
-
         starting = scheduler.scheduleSyncRepeatingTask(main, () -> {
-            counter.getAndDecrement();
+            int count = counter.getAndDecrement();
             Bukkit.getServer().broadcastMessage(ColourUtils.colour(prefix + "&eStarting in " + counter));
             for (Player online : Bukkit.getOnlinePlayers()) {
                 online.playSound(online, Sound.UI_BUTTON_CLICK, 10, 1);
             }
+            if (count <= 1) {
+                runGame();
+            }
         }, 0L, 20L);
-
-        scheduler.scheduleSyncDelayedTask(main, () -> {
-            scheduler.cancelTask(starting);
-            for (Player online : Bukkit.getOnlinePlayers()) {
-                online.sendTitle(ColourUtils.colour("&c&lOne in the Chamber"), "Developed by SecMind", 20, 60, 20);
-                online.playSound(online, Sound.ENTITY_ENDER_DRAGON_GROWL, 10, 1);
-                main.data.createPlayer(online.getPlayer());
-                online.setGameMode(GameMode.ADVENTURE);
-            }
-            giveItems();
-            isGameRunning = true;
-            teleport();
-        }, 100L);
-
-        scheduler.scheduleSyncDelayedTask(main, () -> {
-            Player winner = this.getWinner();
-            Location lobby = new Location(Bukkit.getWorld(Objects.requireNonNull(main.getConfig().getString("lobby.world"))),
-                    main.getConfig().getInt("lobby.x"), main.getConfig().getInt("lobby.y"), main.getConfig().getInt("lobby.z"),
-                    main.getConfig().getInt("lobby.yaw"), main.getConfig().getInt("lobby.pitch"));
-            if (winner != null) {
-                for (Player online : Bukkit.getOnlinePlayers()) {
-                    online.sendTitle(ColourUtils.colour("&4&lGAME OVER"), ColourUtils.colour("&e" + getWinner().getName() + "&a won the game!"), 20, 60, 20);
-                    online.playSound(online, Sound.ENTITY_PLAYER_LEVELUP, 10, 1);
-                    online.getInventory().clear();
-                    online.teleport(lobby);
-                    online.setGameMode(GameMode.ADVENTURE);
-                }
-                winner.playSound(winner.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 10, 5);
-                main.data.addPoints(winner.getUniqueId(), 15);
-                main.data.addWins(winner.getUniqueId(), 1);
-                gameKills.clear();
-                isGameRunning = false;
-                Bukkit.getServer().broadcastMessage(ColourUtils.colour(prefix + "&eCongratulations to &a" + winner.getName() + "&e for winning. They have been given &a15 &epoints."));
-            }
-            else {
-                for (Player online : Bukkit.getOnlinePlayers()) {
-                    online.sendTitle(ColourUtils.colour("&4&lGAME OVER"), ColourUtils.colour("&cThere was no winner."), 20, 60, 20);
-                    online.playSound(online, Sound.BLOCK_ANVIL_FALL, 10, 1);
-                    online.getInventory().clear();
-                    if(main.getConfig().contains("lobby")) {
-                        online.teleport(lobby);
-                    } else {
-                        Bukkit.getServer().broadcastMessage(prefix + "&cLobby spawn not set, could not teleport players.");
-                    }
-                    online.setGameMode(GameMode.ADVENTURE);
-                }
-                gameKills.clear();
-                isGameRunning = false;
-                Bukkit.getServer().broadcastMessage(ColourUtils.colour(prefix + "&cThere was no winner for this game."));
-            }
-        }, 2400L);
     }
 
     ItemStack gameBow = new ItemStack(Material.BOW, 1);
@@ -109,9 +61,14 @@ public class GameManager {
 
     public void teleport() {
         Random randomLoc = new Random();
+        Location location;
         for (Player online : Bukkit.getOnlinePlayers()) {
             int locNumber = randomLoc.nextInt(10) + 1;
-            online.teleport(main.getConfig().getLocation("gamespawn." + locNumber));
+            location = new Location(Bukkit.getWorld(Objects.requireNonNull(main.getConfig().getString("gamespawn." + locNumber + ".world"))),
+                    main.getConfig().getInt("gamespawn." + locNumber + ".x"), main.getConfig().getInt("gamespawn." + locNumber + ".y"),
+                    main.getConfig().getInt("gamespawn." + locNumber + ".z"),
+                    main.getConfig().getInt("gamespawn." + locNumber + ".yaw"), main.getConfig().getInt("gamespawn." + locNumber + ".pitch"));
+            online.teleport(location);
         }
     }
 
@@ -126,6 +83,62 @@ public class GameManager {
             }
         }
         return winner;
+    }
+
+    public int endGameTask;
+
+    private void runGame() {
+        Bukkit.getServer().getScheduler().cancelTask(starting);
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            online.sendTitle(ColourUtils.colour("&c&lOne in the Chamber"), "Developed by SecMind", 20, 60, 20);
+            online.playSound(online, Sound.ENTITY_ENDER_DRAGON_GROWL, 10, 1);
+            main.data.createPlayer(online.getPlayer());
+            online.setGameMode(GameMode.ADVENTURE);
+        }
+        giveItems();
+        teleport();
+        isGameRunning = true;
+        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+        endGameTask = scheduler.scheduleSyncDelayedTask(main, this::startEndingTimer, 2400L);
+    }
+
+    public void startEndingTimer() {
+        Player winner = this.getWinner();
+        Location lobby = new Location(Bukkit.getWorld(Objects.requireNonNull(main.getConfig().getString("lobby.world"))),
+                main.getConfig().getInt("lobby.x"), main.getConfig().getInt("lobby.y"), main.getConfig().getInt("lobby.z"),
+                main.getConfig().getInt("lobby.yaw"), main.getConfig().getInt("lobby.pitch"));
+        if (winner != null) {
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                online.sendTitle(ColourUtils.colour("&4&lGAME OVER"), ColourUtils.colour("&e" + getWinner().getName() + "&a won the game!"), 20, 60, 20);
+                online.playSound(online, Sound.ENTITY_PLAYER_LEVELUP, 10, 1);
+                online.getInventory().clear();
+                online.teleport(lobby);
+                online.setGameMode(GameMode.ADVENTURE);
+            }
+            winner.playSound(winner.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 10, 5);
+            main.data.addPoints(winner.getUniqueId(), 15);
+            main.data.addWins(winner.getUniqueId(), 1);
+            gameKills.clear();
+            isGameRunning = false;
+            Bukkit.getServer().broadcastMessage(ColourUtils.colour(prefix + "&eCongratulations to &a" + winner.getName() + "&e for winning. They have been given &a15 &epoints."));
+        }
+        else {
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                online.sendTitle(ColourUtils.colour("&4&lGAME OVER"), ColourUtils.colour("&cThere was no winner."), 20, 60, 20);
+                online.playSound(online, Sound.BLOCK_ANVIL_FALL, 10, 1);
+                online.getInventory().clear();
+                if (main.getConfig().contains("lobby")) {
+                    online.teleport(lobby);
+                }
+                else {
+                    Bukkit.getServer().broadcastMessage(prefix + "&cLobby spawn not set, could not teleport players.");
+                }
+                online.setGameMode(GameMode.ADVENTURE);
+            }
+            gameKills.clear();
+            isGameRunning = false;
+            Bukkit.getServer().broadcastMessage(ColourUtils.colour(prefix + "&cThere was no winner for this game."));
+        }
     }
 
 }
