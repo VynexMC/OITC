@@ -1,5 +1,6 @@
 package org.mesmeralis.OITC.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -29,6 +30,7 @@ public class AdminCommand implements CommandExecutor {
                 if(args[0].equalsIgnoreCase("start")) {
                     manager.startGame();
                     sender.sendMessage(ColourUtils.colour(manager.prefix + "&aCommand issued successfully."));
+                    Bukkit.getServer().broadcastMessage(ColourUtils.colour(manager.prefix + "&eThe game was force started by &a" + player.getName() + "&e."));
                 }
                 if(args[0].equalsIgnoreCase("setgamespawn")) {
                     sender.sendMessage(ColourUtils.colour(manager.prefix + "&c/admin setgamespawn [1-10]"));
@@ -38,7 +40,13 @@ public class AdminCommand implements CommandExecutor {
                 }
                 if(args[0].equalsIgnoreCase("setlobby")) {
                     player.sendMessage(ColourUtils.colour(manager.prefix + "&aSet the waiting lobby spawn to your location."));
-                    main.getConfig().set("lobby", player.getLocation());
+                   // main.getConfig().set("lobby", player.getLocation());
+                    main.getConfig().set("lobby.world", player.getWorld().getName());
+                    main.getConfig().set("lobby.x", player.getLocation().getX());
+                    main.getConfig().set("lobby.y", player.getLocation().getY());
+                    main.getConfig().set("lobby.z", player.getLocation().getZ());
+                    main.getConfig().set("lobby.pitch", player.getLocation().getPitch());
+                    main.getConfig().set("lobby.yaw", player.getLocation().getYaw());
                     main.saveConfig();
                 }
             }

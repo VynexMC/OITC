@@ -1,9 +1,6 @@
 package org.mesmeralis.OITC.managers;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -19,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GameManager {
 
-    public String prefix = "&c&lOITC &8\u00BB ";
+    public String prefix = "&8–&c&lOITC&8– ";
     public Main main;
     public boolean isGameRunning = false;
     public HashMap<Player, Integer> gameKills = new HashMap<>();
@@ -59,12 +56,15 @@ public class GameManager {
 
         scheduler.scheduleSyncDelayedTask(main, () -> {
             Player winner = this.getWinner();
+            Location lobby = new Location(Bukkit.getWorld(Objects.requireNonNull(main.getConfig().getString("lobby.world"))),
+                    main.getConfig().getInt("lobby.x"), main.getConfig().getInt("lobby.y"), main.getConfig().getInt("lobby.z"),
+                    main.getConfig().getInt("lobby.yaw"), main.getConfig().getInt("lobby.pitch"));
             if (winner != null) {
                 for (Player online : Bukkit.getOnlinePlayers()) {
                     online.sendTitle(ColourUtils.colour("&4&lGAME OVER"), ColourUtils.colour("&e" + getWinner().getName() + "&a won the game!"), 20, 60, 20);
                     online.playSound(online, Sound.ENTITY_PLAYER_LEVELUP, 10, 1);
                     online.getInventory().clear();
-                    online.teleport(Objects.requireNonNull(main.getConfig().getLocation("lobby")));
+                    online.teleport(lobby);
                     online.setGameMode(GameMode.ADVENTURE);
                 }
                 winner.playSound(winner.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 10, 5);
@@ -80,7 +80,7 @@ public class GameManager {
                     online.playSound(online, Sound.BLOCK_ANVIL_FALL, 10, 1);
                     online.getInventory().clear();
                     if(main.getConfig().contains("lobby")) {
-                        online.teleport(Objects.requireNonNull(main.getConfig().getLocation("lobby")));
+                        online.teleport(lobby);
                     } else {
                         Bukkit.getServer().broadcastMessage(prefix + "&cLobby spawn not set, could not teleport players.");
                     }

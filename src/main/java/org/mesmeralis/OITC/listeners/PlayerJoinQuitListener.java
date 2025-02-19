@@ -2,6 +2,8 @@ package org.mesmeralis.OITC.listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,9 +27,21 @@ public class PlayerJoinQuitListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        Location lobby = new Location(Bukkit.getWorld(Objects.requireNonNull(main.getConfig().getString("lobby.world"))),
+                main.getConfig().getInt("lobby.x"), main.getConfig().getInt("lobby.y"), main.getConfig().getInt("lobby.z"),
+                main.getConfig().getInt("lobby.yaw"), main.getConfig().getInt("lobby.pitch"));
         int onlinePlayers = Bukkit.getServer().getOnlinePlayers().size();
         if(!main.gameManager.isGameRunning) {
             event.setJoinMessage(ColourUtils.colour(this.main.gameManager.prefix + "&a" + event.getPlayer().getName() + " joined."));
+            if(main.getConfig().contains("lobby")) {
+                event.getPlayer().teleport(lobby);
+            } else {
+                for (Player admin : Bukkit.getOnlinePlayers()) {
+                    if(admin.hasPermission("oitc.admin")) {
+                        admin.sendMessage(ColourUtils.colour(main.gameManager.prefix + "&cLobby spawn not set."));
+                    }
+                }
+            }
             if(onlinePlayers == playersNeeded) {
                 Bukkit.getServer().broadcastMessage(ColourUtils.colour(this.main.gameManager.prefix + "&aEnough players have joined. Game will start in 15 seconds."));
                 Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(main, () -> {
