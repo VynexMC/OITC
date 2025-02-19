@@ -121,7 +121,7 @@ public class GameManager {
             main.data.addWins(winner.getUniqueId(), 1);
             gameKills.clear();
             isGameRunning = false;
-            Bukkit.getServer().broadcastMessage(ColourUtils.colour(prefix + "&eCongratulations to &a" + winner.getName() + "&e for winning. They have been given &a15 &epoints."));
+            Bukkit.getServer().broadcastMessage(ColourUtils.colour(prefix + "&eCongratulations to &a" + winner.getName() + "&e for winning."));
         }
         else {
             for (Player online : Bukkit.getOnlinePlayers()) {
@@ -141,14 +141,15 @@ public class GameManager {
             Bukkit.getServer().broadcastMessage(ColourUtils.colour(prefix + "&cThere was no winner for this game."));
         }
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(main, () -> {
-            Bukkit.getServer().broadcastMessage(ColourUtils.colour(main.gameManager.prefix + "&aThe next game will begin in 2 minutes."));
+            if(Bukkit.getOnlinePlayers().size() >= PlayerJoinQuitListener.playersNeeded) {
+                Bukkit.getServer().broadcastMessage(ColourUtils.colour(main.gameManager.prefix + "&aThe next game will begin in 2 minutes."));
+            }
         }, 200L);
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(main, () -> {
             if(Bukkit.getOnlinePlayers().size() >= PlayerJoinQuitListener.playersNeeded) {
                 startGame();
             }
         }, 2400L);
-
     }
 
 

@@ -51,7 +51,6 @@ public class StatsCommand implements CommandExecutor {
             }
         }
 
-
         return true;
     }
 }

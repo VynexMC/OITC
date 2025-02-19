@@ -10,3 +10,7 @@ commands:
   stats:
     usage: /stats [args]
     description: Get your stats, or another player's stats.
+  setstats:
+    usage: /setstats [player] [stat] [value]
+    description: Set a player's stats.
+    permission: oitc.setstats

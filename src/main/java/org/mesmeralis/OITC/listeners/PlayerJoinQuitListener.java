@@ -34,8 +34,15 @@ public class PlayerJoinQuitListener implements Listener {
                 main.getConfig().getInt("lobby.x"), main.getConfig().getInt("lobby.y"), main.getConfig().getInt("lobby.z"),
                 main.getConfig().getInt("lobby.yaw"), main.getConfig().getInt("lobby.pitch"));
         int onlinePlayers = Bukkit.getServer().getOnlinePlayers().size();
+        int difference = playersNeeded - onlinePlayers;
         if (!main.gameManager.isGameRunning) {
             event.setJoinMessage(ColourUtils.colour(this.main.gameManager.prefix + "&a" + event.getPlayer().getName() + " joined."));
+            Bukkit.getServer().getScheduler().runTaskLater(main, () -> {
+                if (onlinePlayers < playersNeeded) {
+                    Bukkit.getServer().broadcastMessage(ColourUtils.colour(
+                            this.main.gameManager.prefix + "&a" + difference + " &emore players are needed to start the game."));
+                }
+            }, 20L);
             if (main.getConfig().contains("lobby")) {
                 event.getPlayer().teleport(lobby);
             }
@@ -52,7 +59,8 @@ public class PlayerJoinQuitListener implements Listener {
                     this.main.gameManager.startGame();
                 }, 200L);
             }
-        } else {
+        }
+        else {
             event.setJoinMessage(ColourUtils.colour(this.main.gameManager.prefix + "&a" + event.getPlayer().getName() + " joined as a spectator."));
             setPlayerAsSpectator(event.getPlayer());
         }
@@ -79,28 +87,27 @@ public class PlayerJoinQuitListener implements Listener {
     }
 
 
+    @EventHandler
+    public void onAsyncPlayerJoin(AsyncPlayerPreLoginEvent event) {
+        final int points = this.main.data.getPoints(event.getUniqueId()).join();
+        final int kills = this.main.data.getKills(event.getUniqueId()).join();
+        final int wins = this.main.data.getWins(event.getUniqueId()).join();
+        final int deaths = this.main.data.getDeaths(event.getUniqueId()).join();
+        PapiExpansion.Record record = new PapiExpansion.Record(points, kills, deaths, wins);
+        this.main.map.put(event.getUniqueId(), record);
+    }
 
-@EventHandler
-public void onAsyncPlayerJoin(AsyncPlayerPreLoginEvent event) {
-    final int points = this.main.data.getPoints(event.getUniqueId()).join();
-    final int kills = this.main.data.getKills(event.getUniqueId()).join();
-    final int wins = this.main.data.getWins(event.getUniqueId()).join();
-    final int deaths = this.main.data.getDeaths(event.getUniqueId()).join();
-    PapiExpansion.Record record = new PapiExpansion.Record(points, kills, deaths, wins);
-    this.main.map.put(event.getUniqueId(), record);
-}
-
-private void setPlayerAsSpectator(Player player) {
-    Location location = new Location(Bukkit.getWorld(Objects.requireNonNull(main.getConfig().getString("gamespawn.1.world"))),
-            main.getConfig().getInt("gamespawn.1.x"), main.getConfig().getInt("gamespawn.1.y"),
-            main.getConfig().getInt("gamespawn.1.z"),
-            main.getConfig().getInt("gamespawn.1.yaw"), main.getConfig().getInt("gamespawn.1.pitch"));
-    player.sendMessage(ColourUtils.colour(this.main.gameManager.prefix + "&eYou joined while the game was running, you are now a spectator."));
-    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(main, () -> {
-        player.setGameMode(GameMode.SPECTATOR);
-        player.teleport(location);
-    }, 10L);
-}
+    private void setPlayerAsSpectator(Player player) {
+        Location location = new Location(Bukkit.getWorld(Objects.requireNonNull(main.getConfig().getString("gamespawn.1.world"))),
+                main.getConfig().getInt("gamespawn.1.x"), main.getConfig().getInt("gamespawn.1.y"),
+                main.getConfig().getInt("gamespawn.1.z"),
+                main.getConfig().getInt("gamespawn.1.yaw"), main.getConfig().getInt("gamespawn.1.pitch"));
+        player.sendMessage(ColourUtils.colour(this.main.gameManager.prefix + "&eYou joined while the game was running, you are now a spectator."));
+        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(main, () -> {
+            player.setGameMode(GameMode.SPECTATOR);
+            player.teleport(location);
+        }, 10L);
+    }
 
 
 }
