@@ -51,6 +51,9 @@ public class SetStatsCommand implements CommandExecutor {
                             data.addWins(target.getUniqueId(), value - main.map.get(target.getUniqueId()).wins);
                             player.sendMessage(ColourUtils.colour(manager.prefix + "&aSet the wins of &e" + target.getName() + "&a to &e" + value));
                             break;
+                        default:
+                            player.sendMessage(ColourUtils.colour(manager.prefix + "&cInvalid arguments."));
+                            break;
                     }
                 } else {
                     player.sendMessage(ColourUtils.colour(manager.prefix + "&cThat player has never played before. Unable to set their stats."));
