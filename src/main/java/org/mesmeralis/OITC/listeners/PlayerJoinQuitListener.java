@@ -1,5 +1,7 @@
 package org.mesmeralis.OITC.listeners;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -15,6 +17,7 @@ import org.mesmeralis.OITC.Main;
 import org.mesmeralis.OITC.papi.PapiExpansion;
 import org.mesmeralis.OITC.utils.ColourUtils;
 
+import java.awt.*;
 import java.util.Objects;
 
 public class PlayerJoinQuitListener implements Listener {
@@ -28,6 +31,7 @@ public class PlayerJoinQuitListener implements Listener {
 
     public static int playersNeeded = 2;
 
+    public static int waiting;
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Location lobby = new Location(Bukkit.getWorld(Objects.requireNonNull(main.getConfig().getString("lobby.world"))),
@@ -37,12 +41,18 @@ public class PlayerJoinQuitListener implements Listener {
         int difference = playersNeeded - onlinePlayers;
         if (!main.gameManager.isGameRunning) {
             event.setJoinMessage(ColourUtils.colour(this.main.gameManager.prefix + "&a" + event.getPlayer().getName() + " joined."));
-            Bukkit.getServer().getScheduler().runTaskLater(main, () -> {
-                if (onlinePlayers < playersNeeded) {
+            if (onlinePlayers < playersNeeded) {
+                Bukkit.getServer().getScheduler().runTaskLater(main, () -> {
                     Bukkit.getServer().broadcastMessage(ColourUtils.colour(
                             this.main.gameManager.prefix + "&a" + difference + " &emore players are needed to start the game."));
-                }
-            }, 20L);
+
+                }, 20L);
+                waiting = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(main, () -> {
+                    for(Player online : Bukkit.getOnlinePlayers()) {
+                        online.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ColourUtils.colour("&eWaiting for &a" + difference + " &emore players...")) );
+                    }
+                }, 10L, 20L);
+            }
             if (main.getConfig().contains("lobby")) {
                 event.getPlayer().teleport(lobby);
             }
@@ -54,6 +64,7 @@ public class PlayerJoinQuitListener implements Listener {
                 }
             }
             if (onlinePlayers == playersNeeded) {
+                Bukkit.getScheduler().cancelTask(waiting);
                 Bukkit.getServer().broadcastMessage(ColourUtils.colour(this.main.gameManager.prefix + "&aEnough players have joined. Game will start in 15 seconds."));
                 Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(main, () -> {
                     this.main.gameManager.startGame();

@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scoreboard.Team;
 import org.mesmeralis.OITC.Main;
 import org.mesmeralis.OITC.listeners.PlayerJoinQuitListener;
 import org.mesmeralis.OITC.utils.ColourUtils;
@@ -42,6 +43,7 @@ public class GameManager {
             }
             if (count <= 1) {
                 runGame();
+                Bukkit.getScheduler().cancelTask(PlayerJoinQuitListener.waiting);
             }
         }, 0L, 20L);
     }
@@ -54,6 +56,7 @@ public class GameManager {
         for (Player online : Bukkit.getOnlinePlayers()) {
             online.getInventory().clear();
             bowMeta.addEnchant(Enchantment.INFINITY, 1, false);
+            bowMeta.setUnbreakable(true);
             gameBow.setItemMeta(bowMeta);
             online.getInventory().setItem(0, gameBow);
             online.getInventory().setItem(1, gameArrow);
@@ -95,6 +98,7 @@ public class GameManager {
             online.playSound(online, Sound.ENTITY_ENDER_DRAGON_GROWL, 10, 1);
             main.data.createPlayer(online.getPlayer());
             online.setGameMode(GameMode.ADVENTURE);
+            hideNameTags(online);
         }
         giveItems();
         teleport();
@@ -115,6 +119,7 @@ public class GameManager {
                 online.getInventory().clear();
                 online.teleport(lobby);
                 online.setGameMode(GameMode.ADVENTURE);
+                team.removeEntry(online.getName());
             }
             winner.playSound(winner.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 10, 5);
             main.data.addPoints(winner.getUniqueId(), 15);
@@ -128,6 +133,7 @@ public class GameManager {
                 online.sendTitle(ColourUtils.colour("&4&lGAME OVER"), ColourUtils.colour("&cThere was no winner."), 20, 60, 20);
                 online.playSound(online, Sound.BLOCK_ANVIL_FALL, 10, 1);
                 online.getInventory().clear();
+                team.removeEntry(online.getName());
                 if (main.getConfig().contains("lobby")) {
                     online.teleport(lobby);
                 }
@@ -142,15 +148,28 @@ public class GameManager {
         }
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(main, () -> {
             if(Bukkit.getOnlinePlayers().size() >= PlayerJoinQuitListener.playersNeeded) {
-                Bukkit.getServer().broadcastMessage(ColourUtils.colour(main.gameManager.prefix + "&aThe next game will begin in 2 minutes."));
+                Bukkit.getServer().broadcastMessage(ColourUtils.colour(main.gameManager.prefix + "&aThe next game will begin in 5 minutes."));
             }
         }, 200L);
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(main, () -> {
             if(Bukkit.getOnlinePlayers().size() >= PlayerJoinQuitListener.playersNeeded) {
                 startGame();
             }
-        }, 2400L);
+        }, 6000L);
     }
+
+    Team team;
+    private void hideNameTags(Player player) {
+        if(Bukkit.getServer().getScoreboardManager().getMainScoreboard().getTeams().contains("hidenames")) {
+            team = Bukkit.getServer().getScoreboardManager().getMainScoreboard().registerNewTeam("hidenames");
+            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+            team.addEntry(player.getName());
+        } else {
+            team = Bukkit.getServer().getScoreboardManager().getMainScoreboard().getTeam("hidenames");
+            team.addEntry(player.getName());
+        }
+    }
+
 
 
 }
