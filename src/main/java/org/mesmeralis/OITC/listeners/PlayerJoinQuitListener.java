@@ -17,7 +17,6 @@ import org.mesmeralis.OITC.Main;
 import org.mesmeralis.OITC.papi.PapiExpansion;
 import org.mesmeralis.OITC.utils.ColourUtils;
 
-import java.awt.*;
 import java.util.Objects;
 
 public class PlayerJoinQuitListener implements Listener {

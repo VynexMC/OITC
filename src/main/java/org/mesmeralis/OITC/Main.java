@@ -7,10 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.mesmeralis.OITC.commands.AdminCommand;
 import org.mesmeralis.OITC.commands.SetStatsCommand;
 import org.mesmeralis.OITC.commands.StatsCommand;
-import org.mesmeralis.OITC.listeners.EntityKillListener;
-import org.mesmeralis.OITC.listeners.PlayerDamageListener;
-import org.mesmeralis.OITC.listeners.PlayerJoinQuitListener;
-import org.mesmeralis.OITC.listeners.ProjectileHitListener;
+import org.mesmeralis.OITC.listeners.*;
 import org.mesmeralis.OITC.managers.GameManager;
 import org.mesmeralis.OITC.managers.RankManager;
 import org.mesmeralis.OITC.papi.PapiExpansion;
@@ -78,6 +75,7 @@ public final class Main extends JavaPlugin {
         pluginManager.registerEvents(new PlayerDamageListener(this), this);
         pluginManager.registerEvents(new ProjectileHitListener(this), this);
         pluginManager.registerEvents(new EntityKillListener(this), this);
+        pluginManager.registerEvents(new InventoryListener(this), this);
     }
 
 

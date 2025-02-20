@@ -39,6 +39,13 @@ public class AdminCommand implements CommandExecutor {
                     Bukkit.getServer().broadcastMessage(ColourUtils.colour(manager.prefix + "&eThe game was force started by &a" + player.getName() + "&e."));
                     Bukkit.getServer().broadcastMessage(ColourUtils.colour(manager.prefix + "&eThe game was set to &2ZOMBIE &emode."));
                 }
+                if(args[0].equalsIgnoreCase("start-shuffle")) {
+                    manager.mode = GameManager.Mode.SHUFFLE;
+                    manager.startGame();
+                    sender.sendMessage(ColourUtils.colour(manager.prefix + "&aCommand issued successfully."));
+                    Bukkit.getServer().broadcastMessage(ColourUtils.colour(manager.prefix + "&eThe game was force started by &a" + player.getName() + "&e."));
+                    Bukkit.getServer().broadcastMessage(ColourUtils.colour(manager.prefix + "&eThe game was set to &3SHUFFLE &emode."));
+                }
                 if(args[0].equalsIgnoreCase("stop")) {
                     if(manager.isGameRunning) {
                         player.sendMessage(ColourUtils.colour(manager.prefix + "&aEnded the game."));

@@ -73,6 +73,9 @@ public class PapiExpansion extends PlaceholderExpansion {
                 if(main.gameManager.mode == GameManager.Mode.DEFAULT) {
                     return ColourUtils.colour("&fOriginal");
                 }
+                if(main.gameManager.mode == GameManager.Mode.SHUFFLE) {
+                    return ColourUtils.colour("&3Shuffle");
+                }
                 else {
                     return ColourUtils.colour(main.gameManager.mode.toString());
                 }
