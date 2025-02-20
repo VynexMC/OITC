@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -23,10 +24,10 @@ public class PlayerDamageListener implements Listener {
     public SQLGetter data;
     public Main main;
     Random randomLoc = new Random();
-    public PlayerDamageListener (Main main, GameManager manager, SQLGetter data) {
+    public PlayerDamageListener (Main main) {
         this.main = main;
-        this.manager = manager;
-        this.data = data;
+        this.manager = main.gameManager;
+        this.data = main.data;
     }
 
     @EventHandler
@@ -65,6 +66,28 @@ public class PlayerDamageListener implements Listener {
                 }
         }
 
+        if (event.getDamager() instanceof Zombie) {
+            if (event.getEntity() instanceof Player) {
+                Player damaged = (Player) event.getEntity();
+                int locNumber = randomLoc.nextInt(10) + 1;
+                Location location = new Location(Bukkit.getWorld(Objects.requireNonNull(main.getConfig().getString("gamespawn." +locNumber + ".world"))),
+                        main.getConfig().getInt("gamespawn." + locNumber + ".x"), main.getConfig().getInt("gamespawn." + locNumber + ".y"),
+                        main.getConfig().getInt("gamespawn." + locNumber + ".z"),
+                        main.getConfig().getInt("gamespawn." + locNumber + ".yaw"), main.getConfig().getInt("gamespawn." + locNumber + ".pitch"));
+                if(damaged.getHealth() <= 1) {
+                    Bukkit.getServer().broadcastMessage(ColourUtils.colour(manager.prefix + "&c" + damaged.getName() + " &ewas killed by a zombie."));
+                    data.addDeaths(damaged.getUniqueId(), 1);
+                    if(this.main.map.get(damaged.getUniqueId()).points > 3) {
+                        data.addPoints(damaged.getUniqueId(), -3);
+                    }
+                    event.setCancelled(true);
+                    damaged.teleport(location);
+                    damaged.playSound(Objects.requireNonNull(damaged.getPlayer()).getLocation(), Sound.ENTITY_PLAYER_DEATH, 10, 1);
+                    damaged.sendTitle(ColourUtils.colour("&c&lYOU DIED!"), "", 0, 20, 10);
+                    damaged.setHealth(20);
+                }
+            }
+        }
 
     }
 

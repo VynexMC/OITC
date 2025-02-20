@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.mesmeralis.OITC.commands.AdminCommand;
 import org.mesmeralis.OITC.commands.SetStatsCommand;
 import org.mesmeralis.OITC.commands.StatsCommand;
+import org.mesmeralis.OITC.listeners.EntityKillListener;
 import org.mesmeralis.OITC.listeners.PlayerDamageListener;
 import org.mesmeralis.OITC.listeners.PlayerJoinQuitListener;
 import org.mesmeralis.OITC.listeners.ProjectileHitListener;
@@ -74,8 +75,9 @@ public final class Main extends JavaPlugin {
     private void initListeners() {
         final PluginManager pluginManager = this.getServer().getPluginManager();
         pluginManager.registerEvents(new PlayerJoinQuitListener(this), this);
-        pluginManager.registerEvents(new PlayerDamageListener(this, gameManager, data), this);
-        pluginManager.registerEvents(new ProjectileHitListener(this, gameManager), this);
+        pluginManager.registerEvents(new PlayerDamageListener(this), this);
+        pluginManager.registerEvents(new ProjectileHitListener(this), this);
+        pluginManager.registerEvents(new EntityKillListener(this), this);
     }
 
 

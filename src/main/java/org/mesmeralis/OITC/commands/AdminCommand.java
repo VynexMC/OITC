@@ -32,6 +32,21 @@ public class AdminCommand implements CommandExecutor {
                     sender.sendMessage(ColourUtils.colour(manager.prefix + "&aCommand issued successfully."));
                     Bukkit.getServer().broadcastMessage(ColourUtils.colour(manager.prefix + "&eThe game was force started by &a" + player.getName() + "&e."));
                 }
+                if(args[0].equalsIgnoreCase("start-zombie")) {
+                    manager.mode = GameManager.Mode.ZOMBIE;
+                    manager.startGame();
+                    sender.sendMessage(ColourUtils.colour(manager.prefix + "&aCommand issued successfully."));
+                    Bukkit.getServer().broadcastMessage(ColourUtils.colour(manager.prefix + "&eThe game was force started by &a" + player.getName() + "&e."));
+                    Bukkit.getServer().broadcastMessage(ColourUtils.colour(manager.prefix + "&eThe game was set to &2ZOMBIE &emode."));
+                }
+                if(args[0].equalsIgnoreCase("stop")) {
+                    if(manager.isGameRunning) {
+                        player.sendMessage(ColourUtils.colour(manager.prefix + "&aEnded the game."));
+                        manager.startEndingTimer();
+                    } else {
+                        player.sendMessage(ColourUtils.colour(manager.prefix + "&cGame is not running."));
+                    }
+                }
                 if(args[0].equalsIgnoreCase("setgamespawn")) {
                     sender.sendMessage(ColourUtils.colour(manager.prefix + "&c/admin setgamespawn [1-10]"));
                 }

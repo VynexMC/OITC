@@ -11,9 +11,9 @@ public class ProjectileHitListener implements Listener {
     public Main main;
     public GameManager manager;
 
-    public ProjectileHitListener(Main main, GameManager manager) {
+    public ProjectileHitListener(Main main) {
         this.main = main;
-        this.manager = manager;
+        this.manager = main.gameManager;
     }
 
     @EventHandler

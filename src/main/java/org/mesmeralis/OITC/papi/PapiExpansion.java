@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mesmeralis.OITC.Main;
+import org.mesmeralis.OITC.managers.GameManager;
 import org.mesmeralis.OITC.utils.ColourUtils;
 
 
@@ -64,7 +65,21 @@ public class PapiExpansion extends PlaceholderExpansion {
         if (params.equalsIgnoreCase("topwins")) {
             return ColourUtils.colour(Bukkit.getOfflinePlayer(main.topWins).getName());
         }
-
+        if (params.equalsIgnoreCase("mode")) {
+            if(main.gameManager.isGameRunning) {
+                if(main.gameManager.mode == GameManager.Mode.ZOMBIE) {
+                    return ColourUtils.colour("&2Zombie");
+                }
+                if(main.gameManager.mode == GameManager.Mode.DEFAULT) {
+                    return ColourUtils.colour("&fOriginal");
+                }
+                else {
+                    return ColourUtils.colour(main.gameManager.mode.toString());
+                }
+            } else {
+                return ColourUtils.colour("Waiting");
+            }
+        }
         return null;
     }
 

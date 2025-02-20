@@ -1,8 +1,11 @@
 package org.mesmeralis.OITC.managers;
 
+import com.google.common.collect.Lists;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -11,9 +14,7 @@ import org.mesmeralis.OITC.Main;
 import org.mesmeralis.OITC.listeners.PlayerJoinQuitListener;
 import org.mesmeralis.OITC.utils.ColourUtils;
 
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GameManager {
@@ -93,12 +94,26 @@ public class GameManager {
 
     private void runGame() {
         Bukkit.getServer().getScheduler().cancelTask(starting);
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            online.sendTitle(ColourUtils.colour("&c&lOne in the Chamber"), "Developed by SecMind", 20, 60, 20);
-            online.playSound(online, Sound.ENTITY_ENDER_DRAGON_GROWL, 10, 1);
-            main.data.createPlayer(online.getPlayer());
-            online.setGameMode(GameMode.ADVENTURE);
-            hideNameTags(online);
+        if(mode == null) {
+            mode = Mode.DEFAULT;
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                online.sendTitle(ColourUtils.colour("&c&lOne in the Chamber"), "Developed by SecMind", 20, 60, 20);
+                online.playSound(online, Sound.ENTITY_ENDER_DRAGON_GROWL, 10, 1);
+                main.data.createPlayer(online.getPlayer());
+                online.setGameMode(GameMode.ADVENTURE);
+                hideNameTags(online);
+            }
+        }
+        if(mode == Mode.ZOMBIE) {
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                online.sendTitle(ColourUtils.colour("&c&lOne in the Chamber"), ColourUtils.colour("&2ZOMBIE MODE"), 20, 60, 20);
+                online.playSound(online, Sound.ENTITY_ENDER_DRAGON_GROWL, 10, 1);
+                main.data.createPlayer(online.getPlayer());
+                online.setGameMode(GameMode.ADVENTURE);
+                hideNameTags(online);
+            }
+            runZombie();
+            Bukkit.broadcastMessage(ColourUtils.colour(this.prefix + "&aA zombie will spawn at a random player's location every 30 seconds."));
         }
         giveItems();
         teleport();
@@ -126,6 +141,7 @@ public class GameManager {
             main.data.addWins(winner.getUniqueId(), 1);
             gameKills.clear();
             isGameRunning = false;
+            Bukkit.getScheduler().cancelTask(zombieSpawn);
             Bukkit.getServer().broadcastMessage(ColourUtils.colour(prefix + "&eCongratulations to &a" + winner.getName() + "&e for winning."));
         }
         else {
@@ -142,6 +158,7 @@ public class GameManager {
                 }
                 online.setGameMode(GameMode.ADVENTURE);
             }
+            Bukkit.getScheduler().cancelTask(zombieSpawn);
             gameKills.clear();
             isGameRunning = false;
             Bukkit.getServer().broadcastMessage(ColourUtils.colour(prefix + "&cThere was no winner for this game."));
@@ -168,6 +185,32 @@ public class GameManager {
             team = Bukkit.getServer().getScoreboardManager().getMainScoreboard().getTeam("hidenames");
             team.addEntry(player.getName());
         }
+    }
+
+    public int zombieSpawn;
+    private void runZombie() {
+        zombieSpawn = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(main, () -> {
+            Bukkit.getServer().getWorld(getRandomPlayer().getWorld().getName()).spawnEntity(getRandomPlayer().getLocation(), EntityType.ZOMBIE);
+            Bukkit.broadcastMessage(ColourUtils.colour(this.prefix + "&aA zombie has been spawned at a random player's location!"));
+        }, 100L,  600L);
+        Bukkit.getScheduler().runTaskLater(main, () -> {
+            for(Player online : Bukkit.getOnlinePlayers()) {
+                online.getWorld().getEntitiesByClass(Zombie.class).forEach(c -> c.setHealth(0));
+            }
+        }, 2300L);
+    }
+
+    private Player getRandomPlayer() {
+        List<Player> onlinePlayers = Lists.newArrayList(Bukkit.getOnlinePlayers());
+        Collections.shuffle(onlinePlayers);
+        return onlinePlayers.get(0);
+    }
+
+    public Mode mode;
+    public enum Mode {
+        DEFAULT,
+        ZOMBIE,
+        QUICK;
     }
 
 
